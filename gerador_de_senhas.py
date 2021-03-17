@@ -8,8 +8,9 @@ numeros = string.digits
 caracteres = '_@$&'
 
 concat = letra + numeros + caracteres
-temp = []
-cast = []
+
+temp = []  # lista temporaria para guardar a senha gerada aleatoriamente
+cast = []  # Lista temporaria para guardar a leitura da def excluir()
 
 
 class Dados:
@@ -47,7 +48,7 @@ def senha_auto():
                 soldar = ''.join(temp)  # Concatenando as strings da lista temp
                 print('Gerando senha...')
                 sleep(0.8)
-                print(f'Senha para {entrada} gerada com sucesso! ')
+                print(f'A gerada para {entrada} é {soldar}! \n')
                 escrever.writerow({'Instituição': dado.inst(), 'Senha': soldar})
                 del temp[:]  # Limpando a lista para qua não haja concatecação na gravação
             else:
@@ -128,31 +129,41 @@ def excluir():
     # Abrindo o arquivo e listando os itens
     with open('gerador.csv', 'r', newline='', encoding='utf-8') as abrir:
         ler = csv.DictReader(abrir)
-        for i in ler:
-            cast.append(i)
+        for linhas in ler:
+            cast.append(linhas)
 
-    # pecorrendo o cast
-    """nome = 'Cepramed'
-    for dados in cast:
-        #            chave         valor
-        if dados['Instituição'] == nome:
-            print(dados)
-            cast.remove(dados)
-            print(cast)"""
+    nome = input('Nome: ').title()
+    # removendo item do cast
+    for chave in cast:
+        if chave['Instituição'] == nome:
 
-    """with open('gerador_temp.csv', 'w', newline='', encoding='utf-8') as gerar:
+            print(f'Deseja excluir {nome}? ')
+
+            opc_excluir = input('s/n: ')
+
+            if opc_excluir == 's':
+                print(f'Excluindo {nome}... ')
+                sleep(0.8)
+                cast.remove(chave)
+                sleep(0.8)
+                print(f'{nome} excluido com sucesso!')
+            elif excluir == 'n':
+                break
+
+    # Atualizando o arquivo
+    with open('gerador.csv', 'w', newline='', encoding='utf-8') as atualizar:
         cabecalho = ['Instituição', 'Senha']
-        escrever = csv.DictWriter(gerar, fieldnames=cabecalho, lineterminator='\n')
-        if gerar.tell() == 0:
+        escrever = csv.DictWriter(atualizar, fieldnames=cabecalho)
+        if atualizar.tell() == 0:
             escrever.writeheader()
 
-        escrever.writerow({'Instituição': cast[0], 'Senha': cast[1]})"""
+        # pecorrendo o cast e acessando so os valores
+        for dados in cast:
+            escrever.writerow({'Instituição': dados['Instituição'], 'Senha': dados['Senha']})
 
-    with open('gerador.csv', 'r', newline='', encoding='utf-8') as ler:
-        with open('gerador_temp.csv', 'w', newline='', encoding='utf-8') as gerar:
-            for linha in ler:
-                if linha != 'Google':
-                    gerar.write(linha)
+    # OBS: Necessario limpar o cast para não gerar duplicatas de dados.
+    del cast[:]
+
 
 # Menu
 while True:
@@ -194,4 +205,3 @@ while True:
         print('saindo do gerador senha... ')
         sleep(0.8)
         break
-
