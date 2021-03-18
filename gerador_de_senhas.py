@@ -26,7 +26,7 @@ def senha_auto():
     Função geradora de senha
     :return:
     """
-
+    sleep(.8)
     with open('gerador.csv', 'a', encoding='utf-8', newline='') as gerar:
         cabecalho = ['Instituição', 'Senha']
         escrever = csv.DictWriter(gerar, fieldnames=cabecalho)
@@ -34,10 +34,11 @@ def senha_auto():
             escrever.writeheader()
 
         while True:
-            entrada = input('Digite o nome da instituição ou (1) Para sair: - ').title()
+            entrada = input('Digite o nome da instituição ou (1) para sair: - ').title()
 
-            dado = Dados(entrada)
+            nome = Dados(entrada)
             if entrada != '1':
+
                 # Randomização dos elementos
                 cont = 0
                 while cont < 12:
@@ -49,17 +50,19 @@ def senha_auto():
                 print('Gerando senha...')
                 sleep(0.8)
                 print(f'A gerada para {entrada} é {soldar}! \n')
-                escrever.writerow({'Instituição': dado.inst(), 'Senha': soldar})
+                escrever.writerow({'Instituição': nome.inst(), 'Senha': soldar})
+                sleep(.8)
                 del temp[:]  # Limpando a lista para qua não haja concatecação na gravação
             else:
                 break
+    print('\n')
 
 
 def senha_manual():
-    with open('gerador.csv', 'a', encoding='utf-8', newline='') as grava:
+    with open('gerador.csv', 'a', encoding='utf-8', newline='') as gerar:
         cabecalho = ['Instituição', 'Senha']
-        escrever = csv.DictWriter(grava, fieldnames=cabecalho)
-        if grava.tell() == 0:
+        escrever = csv.DictWriter(gerar, fieldnames=cabecalho)
+        if gerar.tell() == 0:
             escrever.writeheader()
 
         while True:
@@ -70,6 +73,11 @@ def senha_manual():
             else:
                 senha = input('Informer a senha: ')
                 escrever.writerow({'Instituição': opcao, 'Senha': senha})
+                sleep(.8)
+                print(f'A senha para {opcao} é {senha}')
+                sleep(.8)
+                print(f'Senha gravada com sucesso!')
+    print('\n')
 
 
 def ver_senhas():
@@ -79,8 +87,24 @@ def ver_senhas():
     """
     with open('gerador.csv', 'r', newline='', encoding='utf-8') as abrir:
         ler = csv.DictReader(abrir)
+        print('...')
+        sleep(.8)
         for linhas in ler:
             print(linhas)
+        sleep(.8)
+    print('\n')
+
+
+def auto_manual():
+    """
+    Função que da escolha se de gerar senhas manualmente ou automaticamente
+    :return:
+    """
+    opcao = input('Criar senha manual (1) -- Gerar senha automatica (2): ')
+    if opcao == '1':
+        senha_manual()
+    elif opcao == '2':
+        senha_auto()
 
 
 def buscar():
@@ -95,34 +119,18 @@ def buscar():
         item = list(filter(lambda x: x['Instituição'] == buscar, ler))
 
         if item:
+            sleep(.8)
             for i in item:
                 print(i)
+            sleep(.8)
+            print('\n')
         else:
             print(f'{buscar} não se encontra na lista.'
                   f' Deseja gerar uma senha para {buscar}? ')
 
             s_n = input('s/n: ')
             if s_n == 's':
-                with open('gerador.csv', 'a', encoding='utf-8', newline='') as gerar:
-                    cabecalho = ['Instituição', 'Senha']
-                    escrever = csv.DictWriter(gerar, fieldnames=cabecalho)
-                    if gerar.tell() == 0:  # Verifica se existe algo escrito na primeira linha
-                        escrever.writeheader()
-
-                    # Randomização dos elementos
-                    dado = Dados(buscar)
-                    cont = 0
-                    while cont < 12:
-                        randomizar = choice(concat)
-                        temp.append(randomizar)
-                        cont += 1
-
-                    soldar = ''.join(temp)  # Concatenando as strings da lista temp
-                    print('Gerando senha...')
-                    sleep(0.8)
-                    print(f'Senha para {buscar} gerada com sucesso! ')
-                    escrever.writerow({'Instituição': dado.inst(), 'Senha': soldar})
-                    del temp[:]  # Limpando a lista para qua não haja concatecação na gravação
+                auto_manual()
 
 
 def excluir():
@@ -132,7 +140,8 @@ def excluir():
         for linhas in ler:
             cast.append(linhas)
 
-    nome = input('Nome: ').title()
+    nome = input('Nome da Instituição: ').title()
+
     # removendo item do cast
     for chave in cast:
         if chave['Instituição'] == nome:
@@ -163,6 +172,39 @@ def excluir():
 
     # OBS: Necessario limpar o cast para não gerar duplicatas de dados.
     del cast[:]
+    print('\n')
+
+
+def editar():
+    with open('gerador.csv', 'r', newline='', encoding='utf-8') as abrir:
+        ler = csv.DictReader(abrir)
+        for linhas in ler:
+            cast.append(linhas)
+
+    inst = input('Informe o nome da instituição: ').title()
+
+    for chave in cast:
+        if chave['Instituição'] == inst:
+            print(f'Deseja alterar {inst}? ')
+            opcao = input('s/n: ')
+
+            if opcao == 's':
+                cast.remove(chave)
+            elif opcao == 'n':
+                break
+
+    with open('gerador.csv', 'w', newline='', encoding='utf-8') as atualizar:
+        cabecalho = ['Instituição', 'Senha']
+        escrever = csv.DictWriter(atualizar, fieldnames=cabecalho)
+        if atualizar.tell() == 0:
+            escrever.writeheader()
+
+        for dados in cast:
+            escrever.writerow({'Instituição': dados['Instituição'], 'Senha': dados['Senha']})
+
+    del cast[:]
+
+    auto_manual()
 
 
 # Menu
@@ -196,6 +238,7 @@ while True:
 
     elif opc == '5':
         print('=' * 10 + ' Editar Instituição ' + '=' * 10)
+        editar()
 
     elif opc == '6':
         print('=' * 10 + ' Excluir Instituição ' + '=' * 10)
