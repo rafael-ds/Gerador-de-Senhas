@@ -3,6 +3,10 @@
 </h1>
 <br>
 
+<h1 align="center">
+    <img src="img/videoEditado.gif">
+</h1>
+
 # 💻 Sobre
 O projeto **Gerador de Senha** foi desenvolvido com o intuito de praticar e aplicar conhecimentos na **linguagem de programação python.**
 O programa usa o ***.csv*** para salvar e gerenciar os dados criados pelo usuário.
